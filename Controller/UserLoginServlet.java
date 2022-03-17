@@ -16,6 +16,10 @@ import javax.servlet.http.HttpSession;
 import dal.Account;
 import model.User;
 
+/**
+ *
+ * @author congg
+ */
 @WebServlet("/UserLoginServlet")
 public class UserLoginServlet extends HttpServlet {
 
@@ -23,6 +27,13 @@ public class UserLoginServlet extends HttpServlet {
 
     public UserLoginServlet() {
         super();
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
+        dispatcher.forward(request, response);
     }
 
     @Override
@@ -34,20 +45,25 @@ public class UserLoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Account acc = new Account();
         User check = acc.Login(username, password);
-        if (check.getRoleId() == 2) {
-            session.setAttribute("userId", check.getUserId());
-            session.setAttribute("username", username);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("home.jsp");
-            dispatcher.forward(request, response);
-        }else if(check.getRoleId() == 1){
-            session.setAttribute("userId", check);
-            session.setAttribute("usernameAdmin", username);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("dashboard.jsp");
-            dispatcher.forward(request, response);
-        }else {
+        if (check != null) {
+            if (check.getRoleId() == 2) {
+                session.setAttribute("userId", check.getUserId());
+                session.setAttribute("username", username);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("home.jsp");
+                dispatcher.forward(request, response);
+            } 
+            if (check.getRoleId() == 1) {
+                session.setAttribute("userId", check);
+                session.setAttribute("usernameAdmin", username);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("dashboard.jsp");
+                dispatcher.forward(request, response);
+            }
+        } else {
+            request.setAttribute("msg", "Incorrect Account!");
             RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
             dispatcher.forward(request, response);
         }
 
     }
 }
+
